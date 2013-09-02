@@ -332,15 +332,26 @@ awful.rules.rules = {
                      maximized_vertical   = false,
                      maximized_horizontal = false,
                      buttons = clientbuttons } },
-    { rule = { class = "MPlayer" },
-      properties = { floating = true } },
-    { rule = { class = "pinentry" },
-      properties = { floating = true } },
-    { rule = { class = "gimp" },
-      properties = { floating = true } },
     -- Set Firefox to always map on tags number 2 of screen 1.
-    -- { rule = { class = "Firefox" },
-    --   properties = { tag = tags[1][2] } },
+    { rule = { class = "Firefox" },
+      properties = { tag = tags[1][2] } },
+
+    { rule = { class = "Google-chrome" },
+      properties = { tag = tags[1][2] } },
+
+    { rule = { class = "IRC" },
+      properties = { tag = tags[1][3] } },
+
+    { rule = { class = "Sunflower" },
+      properties = { tag = tags[1][5] } },
+
+    { rule = { class = "geany" },
+      properties = { tag = tags[1][4] } },
+    { rule = { class = "Geany" },
+      properties = { tag = tags[1][4] } },
+
+    { rule = { class = "jetbrains-pycharm" },
+      properties = { tag = tags[1][4] } },
 }
 -- }}}
 
@@ -374,3 +385,21 @@ end)
 client.add_signal("focus", function(c) c.border_color = beautiful.border_focus end)
 client.add_signal("unfocus", function(c) c.border_color = beautiful.border_normal end)
 -- }}}
+
+function run_once(cmd)
+  findme = cmd
+  firstspace = cmd:find(" ")
+  if firstspace then
+    findme = cmd:sub(0, firstspace-1)
+  end
+  awful.util.spawn_with_shell("pgrep -u $USER -x " .. findme .. " > /dev/null || (" .. cmd .. ")")
+end
+
+run_once('volumeicon')
+run_once('fdpowermon')
+run_once('nm-applet')
+run_once('sunflower')
+run_once('google-chrome')
+run_once('terminator --class "IRC" -e "echo yoyoman"')
+run_once('xcompmgr -c')
+
