@@ -13,6 +13,20 @@ require("rodentbane")
 -- Load Debian menu entries
 require("debian.menu")
 
+-- Handle Java shit
+function delay_raise ()
+   -- 5 ms ages in computer time, but I won't notice it.
+   local raise_timer = timer { timeout = 0.005 }
+   raise_timer:add_signal("timeout",
+			 function()
+			    if client.focus then
+			       client.focus:raise()
+			    end
+			    raise_timer:stop()
+   end)
+   raise_timer:start()
+end
+
 -- {{{ Error handling
 -- Check if awesome encountered an error during startup and fell back to
 -- another config (This code will only ever execute for the fallback config)
@@ -40,7 +54,7 @@ end
 
 -- {{{ Variable definitions
 -- Themes define colours, icons, and wallpapers
-beautiful.init("/home/czardoz/.config/awesome/themes/elric/theme.lua")
+beautiful.init("/home/aniket/.config/awesome/themes/dust/theme.lua")
 
 -- This is used later as the default terminal and editor to run.
 terminal = "x-terminal-emulator"
@@ -57,9 +71,8 @@ modkey = "Mod4"
 -- Table of layouts to cover with awful.layout.inc, order matters.
 layouts =
 {
-    awful.layout.suit.floating,
-    awful.layout.suit.tile,
     awful.layout.suit.max,
+    awful.layout.suit.tile,
     awful.layout.suit.max.fullscreen,
 }
 -- }}}
@@ -69,7 +82,7 @@ layouts =
 tags = {}
 for s = 1, screen.count() do
     -- Each screen has its own tag table.
-    tags[s] = awful.tag({ "main", "web", "irc", "dev", "files", "extra" }, s, layouts[1])
+    tags[s] = awful.tag({ "main", "web", "slack", "dev", "files", "extra" }, s, layouts[1])
 end
 -- }}}
 
@@ -137,11 +150,11 @@ mytasklist.buttons = awful.util.table.join(
                                           end),
                      awful.button({ }, 4, function ()
                                               awful.client.focus.byidx(1)
-                                              if client.focus then client.focus:raise() end
+                                              delay_raise()
                                           end),
                      awful.button({ }, 5, function ()
                                               awful.client.focus.byidx(-1)
-                                              if client.focus then client.focus:raise() end
+                                              delay_raise()
                                           end))
 
 for s = 1, screen.count() do
@@ -199,12 +212,12 @@ globalkeys = awful.util.table.join(
     awful.key({ modkey,           }, "j",
         function ()
             awful.client.focus.byidx( 1)
-            if client.focus then client.focus:raise() end
+            delay_raise()
         end),
     awful.key({ modkey,           }, "k",
         function ()
             awful.client.focus.byidx(-1)
-            if client.focus then client.focus:raise() end
+            delay_raise()
         end),
     awful.key({ modkey,           }, "w", function () mymainmenu:show({keygrabber=true}) end),
 
@@ -218,9 +231,7 @@ globalkeys = awful.util.table.join(
     function ()
         -- awful.client.focus.history.previous()
         awful.client.focus.byidx(-1)
-        if client.focus then
-            client.focus:raise()
-        end
+        delay_raise()
     end),
 
     -- Standard program
@@ -339,7 +350,9 @@ awful.rules.rules = {
     { rule = { class = "Google-chrome" },
       properties = { tag = tags[1][2] } },
 
-    { rule = { class = "IRC" },
+    { rule = { class = "scudcloud" },
+      properties = { tag = tags[1][3] } },
+    { rule = { class = "Scudcloud" },
       properties = { tag = tags[1][3] } },
 
     { rule = { class = "Sunflower" },
@@ -395,11 +408,8 @@ function run_once(cmd)
   awful.util.spawn_with_shell("pgrep -u $USER -x " .. findme .. " > /dev/null || (" .. cmd .. ")")
 end
 
-run_once('volumeicon')
-run_once('fdpowermon')
+run_once('unity-settings-daemon')
 run_once('nm-applet')
-run_once('sunflower')
-run_once('google-chrome')
-run_once('terminator --class "IRC" -e "echo yoyoman"')
-run_once('xcompmgr -c')
-
+run_once('scudcloud')
+run_once('fdpowermon')
+run_once('volumeicon')
