@@ -409,7 +409,7 @@ function run_once(cmd)
 end
 
 run_once('unity-settings-daemon')
-run_once('xcompmgr -c -C -t-5 -l-5 -r4.2 -o.55')
+run_once('xcompmgr -c -C -f -F -D 2.5 -l -2 -t -2 -r 2 -o 0.25')
 run_once('nm-applet')
 
 run_once('scudcloud')
