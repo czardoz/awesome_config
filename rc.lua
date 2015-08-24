@@ -82,7 +82,7 @@ layouts =
 tags = {}
 for s = 1, screen.count() do
     -- Each screen has its own tag table.
-    tags[s] = awful.tag({ "main", "web", "slack", "dev", "files", "extra" }, s, layouts[1])
+    tags[s] = awful.tag({ "main", "dev", "web", "files", "slack", "extra" }, s, layouts[1])
 end
 -- }}}
 
@@ -91,8 +91,10 @@ end
 myawesomemenu = {
    { "manual", terminal .. " -e man awesome" },
    { "edit config", editor_cmd .. " " .. awesome.conffile },
-   { "restart", awesome.restart },
-   { "quit", awesome.quit }
+   { "wm-restart", awesome.restart },
+   { "wm-quit", awesome.quit },
+   { "shutdown", 'gksudo -D "Shut Down" "shutdown -h now"' },
+   { "restart", 'gksudo -D "Restart" "shutdown -r now"' }
 }
 
 mymainmenu = awful.menu({ items = { { "awesome", myawesomemenu, beautiful.awesome_icon },
@@ -248,6 +250,9 @@ globalkeys = awful.util.table.join(
     awful.key({ modkey,           }, "space", function () awful.layout.inc(layouts,  1) end),
     awful.key({ modkey, "Shift"   }, "space", function () awful.layout.inc(layouts, -1) end),
 
+    awful.key({ modkey, "Control" }, "Right",     function () awful.screen.focus_relative(1) end),
+    awful.key({ modkey, "Control" }, "Left",     function () awful.screen.focus_relative(-1) end),
+
     awful.key({ modkey, "Control" }, "n", awful.client.restore),
 
     -- Prompt
@@ -259,7 +264,14 @@ globalkeys = awful.util.table.join(
                   mypromptbox[mouse.screen].widget,
                   awful.util.eval, nil,
                   awful.util.getdir("cache") .. "/history_eval")
-              end)
+              end),
+
+    -- Brightness
+
+    awful.key({ }, "XF86MonBrightnessDown", function ()
+        awful.util.spawn("xbacklight -dec 15") end),
+    awful.key({ }, "XF86MonBrightnessUp", function ()
+        awful.util.spawn("xbacklight -inc 15") end)
 )
 
 clientkeys = awful.util.table.join(
@@ -344,27 +356,15 @@ awful.rules.rules = {
                      maximized_horizontal = false,
                      buttons = clientbuttons } },
     -- Set Firefox to always map on tags number 2 of screen 1.
-    { rule = { class = "Firefox" },
-      properties = { tag = tags[1][2] } },
-
-    { rule = { class = "Google-chrome" },
-      properties = { tag = tags[1][2] } },
-
     { rule = { class = "scudcloud" },
-      properties = { tag = tags[1][3] } },
+      properties = { tag = tags[1][5] } },
     { rule = { class = "Scudcloud" },
-      properties = { tag = tags[1][3] } },
-
-    { rule = { class = "Sunflower" },
       properties = { tag = tags[1][5] } },
 
     { rule = { class = "geany" },
-      properties = { tag = tags[1][4] } },
+      properties = { tag = tags[1][2] } },
     { rule = { class = "Geany" },
-      properties = { tag = tags[1][4] } },
-
-    { rule = { class = "jetbrains-pycharm" },
-      properties = { tag = tags[1][4] } },
+      properties = { tag = tags[1][2] } },
 }
 -- }}}
 
@@ -409,7 +409,11 @@ function run_once(cmd)
 end
 
 run_once('unity-settings-daemon')
+run_once('xcompmgr -c -C -t-5 -l-5 -r4.2 -o.55')
 run_once('nm-applet')
+
 run_once('scudcloud')
 run_once('fdpowermon')
-run_once('volumeicon')
+run_once('volti')
+run_once('fluxgui')
+run_once('xbacklight -set 35')
